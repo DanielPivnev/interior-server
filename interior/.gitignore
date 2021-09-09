@@ -1,4 +1,4 @@
 .idea
-db.sqlite3
+database_interior.sqlite
 __pycache__/
 .DS_Store
