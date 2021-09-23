@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from products.models import ProductsCategory, Product, ProductsSlidersImages, Contacts
+from interior.settings import MEDIA_URL
 
 
 # Create your views here.
@@ -35,28 +37,31 @@ def index(request):
 
 def products(request):
     content = {
-        'product_slider_imgs': ['img/controll.jpg', 'img/controll1.jpg', 'img/controll2.jpg'],
-        'description_1': 'Отличный сту',
-        'description_2': 'горячее предложение',
-        'price': '2585.9',
+        'categories': [category.name for category in ProductsCategory.objects.all()],
+        'img': f'{MEDIA_URL}{str(Product.objects.get(id=1).main_image)}',
+        'product_slider_imgs': [f'{MEDIA_URL}{str(slider.image)}' for slider in
+                                ProductsSlidersImages.objects.filter(product_id=1)],
+        'title': Product.objects.get(id=1).title,
+        'action': Product.objects.get(id=1).action,
+        'action_text': 'Горячие приджение',
+        'price': Product.objects.get(id=1).price,
         'currency': 'руб',
-        'description_texts': ['Расположитесь комфортно.', 'Отличное качество материалов позволит вам это.',
-                              'Различные цвета', 'высочайший уровеньэргономики и прочность.'],
+        'description_texts': Product.objects.get(id=1).descriptions[2: -2].replace("','", "'").split("'"),
         'products': [
             {
-                'img': 'img/product-11.jpg',
-                'description_title': 'Стул повышенного качества',
-                'description': 'Не оторваться. '
+                'img': f'{MEDIA_URL}{str(Product.objects.get(id=2).main_image)}',
+                'title': Product.objects.get(id=2).title,
+                'hover_icon_description': Product.objects.get(id=2).hover_icon_description
             },
             {
-                'img': 'img/product-21.jpg',
-                'description_title': 'Стул повышенного качества',
-                'description': 'Не оторваться. '
+                'img': f'{MEDIA_URL}{str(Product.objects.get(id=3).main_image)}',
+                'title': Product.objects.get(id=3).title,
+                'hover_icon_description': Product.objects.get(id=3).hover_icon_description
             },
             {
-                'img': 'img/product-31.jpg',
-                'description_title': 'Стул повышенного качества',
-                'description': 'Не оторваться. '
+                'img': f'{MEDIA_URL}{str(Product.objects.get(id=4).main_image)}',
+                'title': Product.objects.get(id=4).title,
+                'hover_icon_description': Product.objects.get(id=4).hover_icon_description
             }
         ]
     }
