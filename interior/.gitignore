@@ -2,3 +2,4 @@
 database_interior.sqlite
 __pycache__/
 .DS_Store
+media

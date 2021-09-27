@@ -40,11 +40,11 @@
 			<div class="tab-content">
                 {% for product in products %}
                     <div class="block">
-                        <a href="#"><img src="{% static product.img %}" alt="">
+                        <a href="#"><img width="270" class="index__img-products" src="{{ product.img }}" alt="">
                             <div class="text">
                                 <img src="{% static 'img/icon-hover.png' %}" alt="img">
-                                <h4>{{ product.description_title }}</h4>
-                                <p>{{ product.description }}</p>
+                                <h4>{{ product.title }}</h4>
+                                <p>{{ product.hover_icon_description }}</p>
                             </div>
                         </a>
                     </div>

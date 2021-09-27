@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:100,300,400,700');
+
+
 * {
 	margin: 0;
 	padding: 0;
@@ -294,6 +296,12 @@ html, body {
 .tab-content a .text img {
 	margin: 70px auto 0;
 }
+
+.tab-content img {
+	width: 270px;
+	height: 270px;
+}
+
 .tab-content a:hover .text {
 	display: block;
 }

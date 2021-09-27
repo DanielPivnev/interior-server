@@ -10,24 +10,19 @@ def index(request):
     content = {
         'products': [
             {
-                'img': 'img/product-1.jpg',
-                'description_title': 'Отличный стул',
-                'description': 'Расположитесь комфортно. '
+                'img': f'{MEDIA_URL}{str(Product.objects.get(id=2).main_image)}',
+                'title': Product.objects.get(id=2).title,
+                'hover_icon_description': Product.objects.get(id=2).hover_icon_description
             },
             {
-                'img': '/img/product-2.jpg',
-                'description_title': 'Отличный стул',
-                'description': 'Расположитесь комфортно. '
+                'img': f'{MEDIA_URL}{str(Product.objects.get(id=3).main_image)}',
+                'title': Product.objects.get(id=3).title,
+                'hover_icon_description': Product.objects.get(id=3).hover_icon_description
             },
             {
-                'img': 'img/product-1.jpg',
-                'description_title': 'Отличный стул',
-                'description': 'Расположитесь комфортно. '
-            },
-            {
-                'img': '/img/product-2.jpg',
-                'description_title': 'Отличный стул',
-                'description': 'Расположитесь комфортно. '
+                'img': f'{MEDIA_URL}{str(Product.objects.get(id=4).main_image)}',
+                'title': Product.objects.get(id=4).title,
+                'hover_icon_description': Product.objects.get(id=4).hover_icon_description
             }
         ]
     }
@@ -73,22 +68,22 @@ def contact(request):
     content = {
         'locations': [
             {
-                'city': 'Москва',
-                'phone_number': '+7-888-888-8888',
-                'email': 'info@geekshop.ru',
-                'address': 'В пределах МКАД'
+                'city': Contacts.objects.get(id=1).city,
+                'phone': Contacts.objects.get(id=1).phone,
+                'email': Contacts.objects.get(id=1).email,
+                'address': Contacts.objects.get(id=1).address
             },
             {
-                'city': 'Москва',
-                'phone_number': '+7-888-888-8888',
-                'email': 'info@geekshop.ru',
-                'address': 'В пределах МКАД'
+                'city': Contacts.objects.get(id=2).city,
+                'phone': Contacts.objects.get(id=2).phone,
+                'email': Contacts.objects.get(id=2).email,
+                'address': Contacts.objects.get(id=2).address
             },
             {
-                'city': 'Москва',
-                'phone_number': '+7-888-888-8888',
-                'email': 'info@geekshop.ru',
-                'address': 'В пределах МКАД'
+                'city': Contacts.objects.get(id=3).city,
+                'phone': Contacts.objects.get(id=3).phone,
+                'email': Contacts.objects.get(id=3).email,
+                'address': Contacts.objects.get(id=3).address
             }
         ]
     }
