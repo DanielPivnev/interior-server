@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from products.views import index, products, contact
+from users.views import login, register, logout, profile
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -27,7 +28,11 @@ urlpatterns = [
     # Own url patterns
     path('', index, name='index'),
     path('products/', products, name='products'),
-    path('contact/', contact, name='contact'),
+    path('contacts/', contact, name='contact'),
+    path('login/', login, name='login'),
+    path('register/', register, name='register'),
+    path('logout/', logout, name='logout'),
+    path('profile/', profile, name='profile')
 ]
 
 if settings.DEBUG:

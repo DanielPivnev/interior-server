@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from products.models import ProductsCategory, Product, ProductsSlidersImages, Contacts
+from products.models import ProductsCategory, Product, ProductsSlidersImage, Contact
 from interior.settings import MEDIA_URL
 
 
@@ -33,9 +33,12 @@ def index(request):
 def products(request):
     content = {
         'categories': [category.name for category in ProductsCategory.objects.all()],
+        'sliders_count': [0, 1, 2],
+        'product_main_slider_imgs': [f'{MEDIA_URL}{str(slider.image)}' for slider in
+                                ProductsSlidersImage.objects.filter(product_id=1)],
         'img': f'{MEDIA_URL}{str(Product.objects.get(id=1).main_image)}',
         'product_slider_imgs': [f'{MEDIA_URL}{str(slider.image)}' for slider in
-                                ProductsSlidersImages.objects.filter(product_id=1)],
+                                ProductsSlidersImage.objects.filter(product_id=1)],
         'title': Product.objects.get(id=1).title,
         'action': Product.objects.get(id=1).action,
         'action_text': 'Горячие приджение',
@@ -68,24 +71,25 @@ def contact(request):
     content = {
         'locations': [
             {
-                'city': Contacts.objects.get(id=1).city,
-                'phone': Contacts.objects.get(id=1).phone,
-                'email': Contacts.objects.get(id=1).email,
-                'address': Contacts.objects.get(id=1).address
+                'city': Contact.objects.get(id=1).city,
+                'phone': Contact.objects.get(id=1).phone,
+                'email': Contact.objects.get(id=1).email,
+                'address': Contact.objects.get(id=1).address
             },
             {
-                'city': Contacts.objects.get(id=2).city,
-                'phone': Contacts.objects.get(id=2).phone,
-                'email': Contacts.objects.get(id=2).email,
-                'address': Contacts.objects.get(id=2).address
+                'city': Contact.objects.get(id=2).city,
+                'phone': Contact.objects.get(id=2).phone,
+                'email': Contact.objects.get(id=2).email,
+                'address': Contact.objects.get(id=2).address
             },
             {
-                'city': Contacts.objects.get(id=3).city,
-                'phone': Contacts.objects.get(id=3).phone,
-                'email': Contacts.objects.get(id=3).email,
-                'address': Contacts.objects.get(id=3).address
+                'city': Contact.objects.get(id=3).city,
+                'phone': Contact.objects.get(id=3).phone,
+                'email': Contact.objects.get(id=3).email,
+                'address': Contact.objects.get(id=3).address
             }
         ]
     }
 
     return render(request, 'products/contact.html', content)
+

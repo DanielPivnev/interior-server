@@ -17,6 +17,7 @@ class Product(models.Model):
     title = models.CharField(max_length=50, blank=True, null=True)
     action = models.BooleanField(default=False, null=True)
     descriptions = models.JSONField(default=list, blank=False, null=False)
+    hover_icon_title = models.CharField(max_length=50, blank=True, null=True)
     hover_icon_description = models.CharField(max_length=50, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     quantity = models.PositiveIntegerField(blank=True, null=True)
@@ -26,7 +27,7 @@ class Product(models.Model):
         return f'{self.category} | {self.title}'
 
 
-class ProductsSlidersImages(models.Model):
+class ProductsSlidersImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, to_field='id')
     image = models.ImageField(upload_to='products_sliders_images', blank=True)
 
@@ -34,7 +35,7 @@ class ProductsSlidersImages(models.Model):
         return f'{self.product}'
 
 
-class Contacts(models.Model):
+class Contact(models.Model):
     city = models.CharField(max_length=50, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     address = models.CharField(max_length=70, blank=True, null=True)
