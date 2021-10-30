@@ -1,95 +1,34 @@
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
-from products.models import ProductsCategory, Product, ProductsSlidersImage, Contact
-from interior.settings import MEDIA_URL
-
+from products.models import ProductsCategory, Product
 
 # Create your views here.
 
 
 def index(request):
+
+    return render(request, 'products/index.html')
+
+
+def products(request, c_id=0, page=1):
+    filtered_products = Product.objects.filter(category_id=c_id) if c_id > 0 else Product.objects.all()
+    paginator = Paginator(filtered_products, per_page=3)
+
+    try:
+        products_paginator = paginator.page(page)
+    except EmptyPage:
+        products_paginator = paginator.page(1)
+    except PageNotAnInteger:
+        products_paginator = paginator.page(paginator.num_pages)
+
+    pages = [p for p in products_paginator.paginator.page_range][page - 3 if page > 3 else 0:page]
+    last_page = [p for p in products_paginator.paginator.page_range][-1:]
+
     content = {
-        'products': [
-            {
-                'img': f'{MEDIA_URL}{str(Product.objects.get(id=2).main_image)}',
-                'title': Product.objects.get(id=2).title,
-                'hover_icon_description': Product.objects.get(id=2).hover_icon_description
-            },
-            {
-                'img': f'{MEDIA_URL}{str(Product.objects.get(id=3).main_image)}',
-                'title': Product.objects.get(id=3).title,
-                'hover_icon_description': Product.objects.get(id=3).hover_icon_description
-            },
-            {
-                'img': f'{MEDIA_URL}{str(Product.objects.get(id=4).main_image)}',
-                'title': Product.objects.get(id=4).title,
-                'hover_icon_description': Product.objects.get(id=4).hover_icon_description
-            }
-        ]
-    }
-
-    return render(request, 'products/index.html', content)
-
-
-def products(request):
-    content = {
-        'categories': [category.name for category in ProductsCategory.objects.all()],
-        'sliders_count': [0, 1, 2],
-        'product_main_slider_imgs': [f'{MEDIA_URL}{str(slider.image)}' for slider in
-                                ProductsSlidersImage.objects.filter(product_id=1)],
-        'img': f'{MEDIA_URL}{str(Product.objects.get(id=1).main_image)}',
-        'product_slider_imgs': [f'{MEDIA_URL}{str(slider.image)}' for slider in
-                                ProductsSlidersImage.objects.filter(product_id=1)],
-        'title': Product.objects.get(id=1).title,
-        'action': Product.objects.get(id=1).action,
-        'action_text': 'Горячие приджение',
-        'price': Product.objects.get(id=1).price,
-        'currency': 'руб',
-        'description_texts': Product.objects.get(id=1).descriptions[2: -2].replace("','", "'").split("'"),
-        'products': [
-            {
-                'img': f'{MEDIA_URL}{str(Product.objects.get(id=2).main_image)}',
-                'title': Product.objects.get(id=2).title,
-                'hover_icon_description': Product.objects.get(id=2).hover_icon_description
-            },
-            {
-                'img': f'{MEDIA_URL}{str(Product.objects.get(id=3).main_image)}',
-                'title': Product.objects.get(id=3).title,
-                'hover_icon_description': Product.objects.get(id=3).hover_icon_description
-            },
-            {
-                'img': f'{MEDIA_URL}{str(Product.objects.get(id=4).main_image)}',
-                'title': Product.objects.get(id=4).title,
-                'hover_icon_description': Product.objects.get(id=4).hover_icon_description
-            }
-        ]
+        'products': products_paginator,
+        'categories': ProductsCategory.objects.all(),
+        'pages': pages + last_page,
+        'c_id': c_id
     }
 
     return render(request, 'products/products.html', content)
-
-
-def contact(request):
-    content = {
-        'locations': [
-            {
-                'city': Contact.objects.get(id=1).city,
-                'phone': Contact.objects.get(id=1).phone,
-                'email': Contact.objects.get(id=1).email,
-                'address': Contact.objects.get(id=1).address
-            },
-            {
-                'city': Contact.objects.get(id=2).city,
-                'phone': Contact.objects.get(id=2).phone,
-                'email': Contact.objects.get(id=2).email,
-                'address': Contact.objects.get(id=2).address
-            },
-            {
-                'city': Contact.objects.get(id=3).city,
-                'phone': Contact.objects.get(id=3).phone,
-                'email': Contact.objects.get(id=3).email,
-                'address': Contact.objects.get(id=3).address
-            }
-        ]
-    }
-
-    return render(request, 'products/contact.html', content)
-

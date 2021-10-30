@@ -13,10 +13,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -24,11 +22,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-hdqe!z0(f6^8-$01-wix6&(14co_sl(nbkx-gx329_u_(yz&*)'
 
+from dotenv import load_dotenv
+
+load_dotenv(BASE_DIR / '.env')
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -42,7 +43,9 @@ INSTALLED_APPS = [
 
     # Own apps
     'products',
-    'users'
+    'users',
+    'baskets',
+    'admins'
 ]
 
 MIDDLEWARE = [
@@ -75,7 +78,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'interior.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -85,7 +87,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'database_interior.sqlite',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -105,7 +106,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -119,7 +119,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -136,3 +135,17 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'interior', 'media')
 
 AUTH_USER_MODEL = 'users.User'
+
+LOGIN_URL = '/users/login/'
+
+DOMAIN_NAME = 'http:localhost:8000'
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = '25'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_USE_SSL = True if os.getenv('EMAIL_USE_SSL') is 'True' else False
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIl_FIlE_PATH = 'tmp/emails'
+DEFAULT_FROM_EMAIL = 'workorbit@gmail.com'
+SERVER_EMAIL = 'workorbit@gmail.com'
+EMAIL_USE_TLS = True

@@ -1,13 +1,29 @@
-from django.shortcuts import render, HttpResponseRedirect
-from .forms import UserLoginForm, UserRegisterForm, UserProfileForm
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView, LogoutView
+from django.core.mail import send_mail
+from django.shortcuts import render, HttpResponseRedirect, redirect, get_object_or_404
 from django.contrib import auth
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.generic import CreateView, FormView, UpdateView
+from django.contrib.messages.views import SuccessMessageMixin
+from users.forms import UserRegisterForm, UserLoginForm, UserProfileForm
+from django.contrib import messages
+from users.models import User
+from baskets.models import Basket
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from users.forms import UserProfileEditForm
+from django.views.generic.list import ListView
+from users.models import UserProfile
 
+# FBV  = Function-Based-Views
+# CBV  = Class-Based-Views
+from interior import settings
 
-# Create your views here
 
 def login(request):
-
     if request.method == 'POST':
         form = UserLoginForm(data=request.POST)
 
@@ -33,43 +49,101 @@ def login(request):
         return render(request, 'users/login.html', context)
 
 
-def register(request):
+class RegisterListView(FormView):
+    model = User
+    template_name = 'users/register.html'
+    form_class = UserRegisterForm
+    # success_message = 'Вы успешно зарегистрировались!'
+    success_url = reverse_lazy('users:login')
 
-    if request.method == 'POST':
-        form = UserRegisterForm(data=request.POST)
+    def get_context_data(self, **kwargs):
+        context = super(RegisterListView, self).get_context_data(**kwargs)
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(data=request.POST)
 
         if form.is_valid():
-            form.save()
-            username = request.POST['username']
-            password = request.POST['password1']
+            user = form.save()
+            if self.send_verify_mail(user):
+                messages.success(request, 'Вы успешно зарегистрировались!')
+                return redirect(self.success_url)
 
-            user = auth.authenticate(username=username, password=password1)
-            auth.login(request, user)
+            return redirect(self.success_url)
 
+        return render(request, self.template_name, {'form': form})
+
+    def send_verify_mail(self, user):
+        verify_link = reverse_lazy('users:verify', args=[user.email, user.activation_key])
+
+        title = f'Для активации учетной записи {user.username} пройдите по ссылке'
+
+        message = f'Для подтверждения учетной записи {user.username} пройдите по ссылке: \n{settings.DOMAIN_NAME}' \
+                  f'{verify_link}'
+
+        return send_mail(title, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+
+    def verify(self, email, activation_key):
+        try:
+            user = User.objects.get(email=email)
+            if user.activation_key == activation_key and not user.is_activation_key_expires():
+                user.is_active = True
+                user.save()
+                auth.login(self, user, backend='django.contrib.auth.backends.ModelBackend')
+                return render(self, 'users/verification.html')
+            else:
+                print(f'error activation user: {user}')
+                return render(self, 'users/verification.html')
+        except Exception as e:
+            print(f'error activation user : {e.args}')
             return HttpResponseRedirect(reverse('index'))
-        else:
-            context = {
-                'form': form
-            }
-
-            return render(request, 'users/register.html', context)
-    else:
-        context = {
-            'form': UserRegisterForm()
-        }
-
-        return render(request, 'users/register.html', context)
 
 
-def logout(request):
-    auth.logout(request)
-
-    return HttpResponseRedirect(reverse('index'))
+class Logout(LogoutView):
+    template_name = "products/index.html"
 
 
-def profile(request):
+def privacy_policy(request):
     context = {
-        'form': UserProfileForm(instance=request.user)
+        'title': 'Privacy policy',
     }
+    return render(request, 'users/privacy-policy.html', context)
 
-    return render(request, 'users/profile.html', context)
+
+class ProfileFormView(LoginRequiredMixin, UpdateView):
+    model = UserProfile
+    form_class = UserProfileForm
+    template_name = 'users/profile.html'
+    form_class_second = UserProfileEditForm
+    success_url = reverse_lazy('users:profile')
+
+    def get_context_data(self, **kwargs):
+        context = super(ProfileFormView, self).get_context_data(**kwargs)
+        context['profile_form'] = self.form_class_second(instance=self.request.user.userprofile)
+        context['baskets'] = Basket.objects.filter(user=self.request.user)
+
+        return context
+
+    def get_object(self):
+        return get_object_or_404(User, pk=self.request.user.pk)
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(ProfileFormView, self).dispatch(request, *args, **kwargs)
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(pk=self.request.user.pk)
+        edit_form = UserProfileForm(data=request.POST, files=request.FILES, instance=user)
+        profile_form = UserProfileEditForm(data=request.POST, files=request.FILES, instance=user.userprofile)
+
+        if edit_form.is_valid() and profile_form.is_valid():
+            edit_form.save()
+            user.userprofile.save()
+            return HttpResponseRedirect(self.success_url)
+
+        return render(request, self.template_name, {
+            'form': edit_form,
+            'profile_form': profile_form,
+        })

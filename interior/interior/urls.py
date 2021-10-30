@@ -16,23 +16,20 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from products.views import index, products, contact
-from users.views import login, register, logout, profile
+from products.views import index, products
 from django.conf import settings
 from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls, name='admin'),
 
     # Own url patterns
     path('', index, name='index'),
-    path('products/', products, name='products'),
-    path('contacts/', contact, name='contact'),
-    path('login/', login, name='login'),
-    path('register/', register, name='register'),
-    path('logout/', logout, name='logout'),
-    path('profile/', profile, name='profile')
+    path('products/', include('products.urls', namespace='products')),
+    path('users/', include('users.urls', namespace='users')),
+    path('baskets/', include('baskets.urls', namespace='baskets')),
+    path('admins/', include('admins.urls', namespace='admins'))
 ]
 
 if settings.DEBUG:
